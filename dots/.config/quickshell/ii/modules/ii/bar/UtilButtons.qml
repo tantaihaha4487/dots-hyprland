@@ -100,8 +100,12 @@ Item {
             }
         }
 
-        CodexBar {
-            Layout.alignment: Qt.AlignVCenter
+        Loader {
+            active: Config.options.bar.utilButtons.showCodexUsage
+            visible: Config.options.bar.utilButtons.showCodexUsage
+            sourceComponent: CodexBar {
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
 
         Loader {
