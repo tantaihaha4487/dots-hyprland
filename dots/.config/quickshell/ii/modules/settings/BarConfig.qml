@@ -209,6 +209,17 @@ ContentPage {
         ConfigRow {
             uniform: true
             ConfigSwitch {
+                buttonIcon: "smart_toy"
+                text: Translation.tr("Codex weekly usage")
+                checked: Config.options.bar.utilButtons.showCodexUsage
+                onCheckedChanged: {
+                    Config.options.bar.utilButtons.showCodexUsage = checked;
+                }
+            }
+        }
+        ConfigRow {
+            uniform: true
+            ConfigSwitch {
                 buttonIcon: "dark_mode"
                 text: Translation.tr("Dark/Light toggle")
                 checked: Config.options.bar.utilButtons.showDarkModeToggle
