@@ -100,6 +100,10 @@ Item {
             }
         }
 
+        CodexBar {
+            Layout.alignment: Qt.AlignVCenter
+        }
+
         Loader {
             active: Config.options.bar.utilButtons.showDarkModeToggle
             visible: Config.options.bar.utilButtons.showDarkModeToggle
