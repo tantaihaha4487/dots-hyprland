@@ -10,6 +10,8 @@ StyledPopup {
 
     property var usageEntry: null
     property string errorText: ""
+    property bool showPace: true
+    property bool showResetCredits: true
     signal refreshRequested()
 
     readonly property var usage: usageEntry?.usage ?? null
@@ -176,7 +178,7 @@ StyledPopup {
             visible: root.usage?.secondary != null
             title: "Weekly"
             windowData: root.usage?.secondary ?? null
-            note: root.pace?.summary ?? ""
+            note: root.showPace ? (root.pace?.summary ?? "") : ""
         }
 
         UsageSection {
@@ -186,7 +188,7 @@ StyledPopup {
         }
 
         ColumnLayout {
-            visible: (root.usage?.codexResetCredits?.availableCount ?? 0) > 0
+            visible: root.showResetCredits && (root.usage?.codexResetCredits?.availableCount ?? 0) > 0
             Layout.fillWidth: true
             spacing: 4
 

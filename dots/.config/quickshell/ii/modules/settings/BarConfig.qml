@@ -250,6 +250,82 @@ ContentPage {
     }
 
     ContentSection {
+        icon: "smart_toy"
+        title: Translation.tr("CodexBar")
+
+        ContentSubsection {
+            title: Translation.tr("Bar display")
+
+            ConfigSelectionArray {
+                currentValue: Config.options.bar.codexUsage.displayMode
+                onSelected: newValue => {
+                    Config.options.bar.codexUsage.displayMode = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("Remaining"),
+                        icon: "hourglass_top",
+                        value: "remaining"
+                    },
+                    {
+                        displayName: Translation.tr("Used"),
+                        icon: "data_usage",
+                        value: "used"
+                    },
+                    {
+                        displayName: Translation.tr("Icon only"),
+                        icon: "hide_source",
+                        value: "iconOnly"
+                    }
+                ]
+            }
+        }
+
+        ConfigSpinBox {
+            icon: "refresh"
+            text: Translation.tr("Refresh interval (minutes)")
+            value: Config.options.bar.codexUsage.refreshIntervalMinutes
+            from: 1
+            to: 60
+            stepSize: 1
+            onValueChanged: {
+                Config.options.bar.codexUsage.refreshIntervalMinutes = value;
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "preview"
+            text: Translation.tr("Show usage popup")
+            checked: Config.options.bar.codexUsage.showPopup
+            onCheckedChanged: {
+                Config.options.bar.codexUsage.showPopup = checked;
+            }
+        }
+
+        ConfigRow {
+            uniform: true
+
+            ConfigSwitch {
+                buttonIcon: "speed"
+                text: Translation.tr("Show pace")
+                checked: Config.options.bar.codexUsage.showPace
+                onCheckedChanged: {
+                    Config.options.bar.codexUsage.showPace = checked;
+                }
+            }
+
+            ConfigSwitch {
+                buttonIcon: "restart_alt"
+                text: Translation.tr("Show reset credits")
+                checked: Config.options.bar.codexUsage.showResetCredits
+                onCheckedChanged: {
+                    Config.options.bar.codexUsage.showResetCredits = checked;
+                }
+            }
+        }
+    }
+
+    ContentSection {
         icon: "cloud"
         title: Translation.tr("Weather")
         ConfigSwitch {

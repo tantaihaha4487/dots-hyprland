@@ -248,6 +248,13 @@ Singleton {
                     property int swapWarningThreshold: 85
                     property int cpuWarningThreshold: 90
                 }
+                property JsonObject codexUsage: JsonObject {
+                    property string displayMode: "remaining" // remaining | used | iconOnly
+                    property int refreshIntervalMinutes: 5
+                    property bool showPopup: true
+                    property bool showPace: true
+                    property bool showResetCredits: true
+                }
                 property list<string> screenList: [] // List of names, like "eDP-1", find out with 'hyprctl monitors' command
                 property JsonObject utilButtons: JsonObject {
                     property bool showScreenSnip: true

@@ -55,8 +55,17 @@ Item {
 
     function formatPercentages(data) {
         const weeklyUsed = data?.[0]?.usage?.secondary?.usedPercent
-        if (typeof weeklyUsed === "number")
-            return `Week ${Math.round(Math.max(0, Math.min(100, 100 - weeklyUsed)))}% left`
+        if (typeof weeklyUsed === "number") {
+            const used = Math.round(Math.max(0, Math.min(100, weeklyUsed)))
+            switch (Config.options.bar.codexUsage.displayMode) {
+            case "used":
+                return `Week ${used}% used`
+            case "iconOnly":
+                return ""
+            default:
+                return `Week ${100 - used}% left`
+            }
+        }
 
         const percentages = []
         collectPercentages(data, percentages)
@@ -72,7 +81,15 @@ Item {
 
         // CodexBar reports the short session window before the weekly window.
         const weekly = unique.length > 1 ? unique[1] : unique[0]
-        return `Week ${Math.round(weekly)}% left`
+        const used = Math.round(weekly)
+        switch (Config.options.bar.codexUsage.displayMode) {
+        case "used":
+            return `Week ${used}% used`
+        case "iconOnly":
+            return ""
+        default:
+            return `Week ${100 - used}% left`
+        }
     }
 
     function updateFrom(text) {
@@ -112,7 +129,7 @@ Item {
     }
 
     Timer {
-        interval: 300000
+        interval: Math.max(1, Config.options.bar.codexUsage.refreshIntervalMinutes) * 60000
         running: true
         repeat: true
         onTriggered: {
@@ -172,9 +189,11 @@ Item {
         onClicked: root.refreshUsage()
 
         CodexPopup {
-            hoverTarget: mouseArea
+            hoverTarget: Config.options.bar.codexUsage.showPopup ? mouseArea : null
             usageEntry: root.usageEntry
             errorText: root.errorText
+            showPace: Config.options.bar.codexUsage.showPace
+            showResetCredits: Config.options.bar.codexUsage.showResetCredits
             onRefreshRequested: root.refreshUsage()
         }
     }

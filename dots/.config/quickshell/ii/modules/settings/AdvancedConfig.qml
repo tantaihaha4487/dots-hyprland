@@ -90,6 +90,35 @@ ContentPage {
         }
     }
 
+    ContentSection {
+        icon: "warning"
+        title: Translation.tr("Conflicting programs")
+
+        ConfigSwitch {
+            buttonIcon: "dock_to_right"
+            text: Translation.tr("Automatically stop conflicting system trays")
+            checked: Config.options.conflictKiller.autoKillTrays
+            onCheckedChanged: {
+                Config.options.conflictKiller.autoKillTrays = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Stops kded6 when it conflicts with the shell system tray")
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "notifications_off"
+            text: Translation.tr("Automatically stop conflicting notification daemons")
+            checked: Config.options.conflictKiller.autoKillNotificationDaemons
+            onCheckedChanged: {
+                Config.options.conflictKiller.autoKillNotificationDaemons = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Stops mako or dunst when they conflict with shell notifications")
+            }
+        }
+    }
+
 
 
 }
