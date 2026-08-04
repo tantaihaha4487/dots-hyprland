@@ -12,6 +12,8 @@ Item {
     property string statusText: "Codex"
     property string detailText: "Waiting for CodexBar"
     property color textColor: Appearance.colors.colOnLayer1
+    property var usageEntry: null
+    property string errorText: ""
 
     implicitWidth: contentLayout.implicitWidth
     implicitHeight: Appearance.sizes.barHeight
@@ -80,15 +82,24 @@ Item {
             if (error) {
                 root.statusText = "Codex !"
                 root.detailText = error.message || "CodexBar could not fetch usage"
+                root.errorText = root.detailText
                 return
             }
 
+            root.usageEntry = data?.[0] ?? null
+            root.errorText = ""
             root.statusText = formatPercentages(data)
             root.detailText = "CodexBar usage"
         } catch (error) {
             root.statusText = "Codex !"
             root.detailText = "Invalid CodexBar JSON output"
+            root.errorText = root.detailText
         }
+    }
+
+    function refreshUsage() {
+        if (!usageProcess.running)
+            usageProcess.running = true
     }
 
     Process {
@@ -110,7 +121,7 @@ Item {
         }
     }
 
-    Component.onCompleted: usageProcess.running = true
+    Component.onCompleted: refreshUsage()
 
     RowLayout {
         id: contentLayout
@@ -156,13 +167,15 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        acceptedButtons: Qt.NoButton
+        acceptedButtons: Qt.LeftButton
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.refreshUsage()
 
-        PopupToolTip {
-            extraVisibleCondition: mouseArea.containsMouse
-            alternativeVisibleCondition: extraVisibleCondition
-            text: root.detailText
-            anchorEdges: (!Config.options.bar.bottom && !Config.options.bar.vertical) ? Edges.Bottom : Edges.Top
+        CodexPopup {
+            hoverTarget: mouseArea
+            usageEntry: root.usageEntry
+            errorText: root.errorText
+            onRefreshRequested: root.refreshUsage()
         }
     }
 }

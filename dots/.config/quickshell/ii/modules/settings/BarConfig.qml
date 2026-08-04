@@ -210,7 +210,7 @@ ContentPage {
             uniform: true
             ConfigSwitch {
                 buttonIcon: "smart_toy"
-                text: Translation.tr("Codex weekly usage")
+                text: Translation.tr("CodexBar usage panel")
                 checked: Config.options.bar.utilButtons.showCodexUsage
                 onCheckedChanged: {
                     Config.options.bar.utilButtons.showCodexUsage = checked;
