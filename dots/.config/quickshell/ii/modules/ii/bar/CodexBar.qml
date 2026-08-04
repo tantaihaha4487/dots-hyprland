@@ -138,6 +138,15 @@ Item {
         }
     }
 
+    Connections {
+        target: Config.options.bar.codexUsage
+
+        function onDisplayModeChanged() {
+            if (root.usageEntry)
+                root.statusText = root.formatPercentages([root.usageEntry])
+        }
+    }
+
     Component.onCompleted: refreshUsage()
 
     RowLayout {
@@ -165,6 +174,7 @@ Item {
 
         Item {
             Layout.alignment: Qt.AlignVCenter
+            visible: root.statusText.length > 0
             implicitHeight: 20
             implicitWidth: textLabel.implicitWidth
 
