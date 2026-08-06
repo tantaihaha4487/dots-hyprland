@@ -30,6 +30,18 @@ StyledPopup {
         return Math.max(0, Math.min(100, value))
     }
 
+    function percentText(value) {
+        const used = Math.round(root.clampPercent(value))
+        switch (Config.options.bar.codexUsage.displayMode) {
+        case "used":
+            return `${used}% used`
+        case "iconOnly":
+            return `${100 - used}% left`
+        default:
+            return `${100 - used}% left`
+        }
+    }
+
     function resetText(value) {
         if (!value)
             return "Reset unavailable"
@@ -72,7 +84,7 @@ StyledPopup {
         RowLayout {
             Layout.fillWidth: true
             StyledText {
-                text: `${Math.round(root.clampPercent(parent.parent.windowData?.usedPercent ?? 0))}% used`
+                text: root.percentText(parent.parent.windowData?.usedPercent ?? 0)
                 color: Appearance.colors.colOnLayer2
             }
             Item { Layout.fillWidth: true }
