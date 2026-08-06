@@ -9,6 +9,7 @@ StyledPopup {
     id: root
 
     popupWidth: 380
+    popupContentPadding: 12
 
     property var usageEntry: null
     property var accountEntries: []
