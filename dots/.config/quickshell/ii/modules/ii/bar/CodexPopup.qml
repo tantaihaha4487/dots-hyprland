@@ -8,6 +8,8 @@ import qs.modules.common.widgets
 StyledPopup {
     id: root
 
+    popupWidth: 380
+
     property var usageEntry: null
     property var accountEntries: []
     property string accountDisplayMode: "all"
