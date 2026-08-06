@@ -202,11 +202,17 @@ StyledPopup {
         }
     }
 
-    ColumnLayout {
+    Item {
         anchors.centerIn: parent
+        height: implicitHeight
         width: 330
         implicitWidth: 330
-        spacing: 12
+        implicitHeight: popupLayout.implicitHeight
+
+        ColumnLayout {
+            id: popupLayout
+            anchors.fill: parent
+            spacing: 12
 
         RowLayout {
             Layout.fillWidth: true
@@ -294,41 +300,42 @@ StyledPopup {
             color: Appearance.colors.colLayer0Border
         }
 
-        MouseArea {
-            Layout.fillWidth: true
-            implicitHeight: 32
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.refreshRequested()
+            MouseArea {
+                Layout.fillWidth: true
+                implicitHeight: 32
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.refreshRequested()
 
-            Rectangle {
-                anchors.fill: parent
-                radius: Appearance.rounding.verysmall
-                color: parent.containsMouse ? Appearance.colors.colLayer2Hover : "transparent"
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 6
-                anchors.rightMargin: 6
-
-                MaterialSymbol {
-                    text: "refresh"
-                    iconSize: Appearance.font.pixelSize.large
-                    color: Appearance.colors.colOnLayer2
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Appearance.rounding.verysmall
+                    color: parent.containsMouse ? Appearance.colors.colLayer2Hover : "transparent"
                 }
 
-                StyledText {
-                    text: "Refresh usage"
-                    color: Appearance.colors.colOnLayer2
-                }
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: 6
+                    anchors.rightMargin: 6
 
-                Item { Layout.fillWidth: true }
+                    MaterialSymbol {
+                        text: "refresh"
+                        iconSize: Appearance.font.pixelSize.large
+                        color: Appearance.colors.colOnLayer2
+                    }
 
-                StyledText {
-                    text: root.displayEntries.length > 0 ? "CodexBar data" : "Waiting for CodexBar"
-                    color: Appearance.colors.colSubtext
-                    font.pixelSize: Appearance.font.pixelSize.small
+                    StyledText {
+                        text: "Refresh usage"
+                        color: Appearance.colors.colOnLayer2
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    StyledText {
+                        text: root.displayEntries.length > 0 ? "CodexBar data" : "Waiting for CodexBar"
+                        color: Appearance.colors.colSubtext
+                        font.pixelSize: Appearance.font.pixelSize.small
+                    }
                 }
             }
         }
