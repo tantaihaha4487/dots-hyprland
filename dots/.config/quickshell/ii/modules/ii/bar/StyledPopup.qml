@@ -12,8 +12,6 @@ LazyLoader {
     property Item hoverTarget
     default property Item contentItem
     property real popupBackgroundMargin: 0
-    property real popupWidth: 0
-    property real popupContentPadding: 0
 
     active: hoverTarget && hoverTarget.containsMouse
 
@@ -26,8 +24,7 @@ LazyLoader {
         anchors.top: Config.options.bar.vertical || (!Config.options.bar.vertical && !Config.options.bar.bottom)
         anchors.bottom: !Config.options.bar.vertical && Config.options.bar.bottom
 
-        implicitWidth: Math.max(root.popupWidth,
-                                popupBackground.implicitWidth + Appearance.sizes.elevationMargin * 2 + root.popupBackgroundMargin)
+        implicitWidth: popupBackground.implicitWidth + Appearance.sizes.elevationMargin * 2 + root.popupBackgroundMargin
         implicitHeight: popupBackground.implicitHeight + Appearance.sizes.elevationMargin * 2 + root.popupBackgroundMargin
 
         mask: Region {
@@ -71,18 +68,11 @@ LazyLoader {
                 topMargin: Appearance.sizes.elevationMargin + root.popupBackgroundMargin * (!popupWindow.anchors.top)
                 bottomMargin: Appearance.sizes.elevationMargin + root.popupBackgroundMargin * (!popupWindow.anchors.bottom)
             }
-            implicitWidth: contentContainer.implicitWidth + margin * 2
-            implicitHeight: contentContainer.implicitHeight + margin * 2
+            implicitWidth: root.contentItem.implicitWidth + margin * 2
+            implicitHeight: root.contentItem.implicitHeight + margin * 2
             color: Appearance.m3colors.m3surfaceContainer
             radius: Appearance.rounding.small
-
-            Item {
-                id: contentContainer
-                anchors.fill: parent
-                implicitWidth: root.contentItem.implicitWidth + root.popupContentPadding * 2
-                implicitHeight: root.contentItem.implicitHeight + root.popupContentPadding * 2
-                children: [root.contentItem]
-            }
+            children: [root.contentItem]
 
             border.width: 1
             border.color: Appearance.colors.colLayer0Border
