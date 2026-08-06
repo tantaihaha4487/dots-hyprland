@@ -66,6 +66,16 @@ if ! command -v yay >/dev/null 2>&1;then
   v install-yay
 fi
 
+# CodexBar provides the `codexbar` CLI used by the ii Codex usage widget.
+# Use the CLI package explicitly: the similarly named `codexbar` AUR package
+# is an unrelated Waybar widget.
+install-codexbar(){
+  x yay -S --needed --noconfirm codexbar-cli
+}
+
+showfun install-codexbar
+v install-codexbar
+
 showfun implicitize_old_dependencies
 v implicitize_old_dependencies
 
