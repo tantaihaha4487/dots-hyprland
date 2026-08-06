@@ -172,6 +172,7 @@ StyledPopup {
 
     ColumnLayout {
         anchors.centerIn: parent
+        width: 360
         implicitWidth: 330
         spacing: 12
 
