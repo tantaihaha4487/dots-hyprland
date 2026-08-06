@@ -38,6 +38,7 @@
   - **QoL**: screen translation, anti-flashbang, Google Lens
   - **Material themes**: Choose your wallpaper, done, enjoy
   - **Transparent installation**: Every command is shown before it's run
+  - **CodexBar**: [Add another Codex account on Linux](../docs/codexbar-multi-account.md)
 </details>
 
 <details> 
