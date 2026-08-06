@@ -128,7 +128,8 @@ Item {
             root.refreshQueued = true
             return
         }
-        root.accountEntries = []
+        if (Config.options.bar.codexUsage.accountDisplayMode !== "all")
+            root.accountEntries = []
         if (!usageProcess.running)
             usageProcess.running = true
     }
@@ -237,6 +238,10 @@ Item {
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton
         cursorShape: Qt.PointingHandCursor
+        onEntered: {
+            if (Config.options.bar.codexUsage.accountDisplayMode === "all" && root.accountEntries.length === 0)
+                root.refreshUsage()
+        }
         onClicked: root.refreshUsage()
 
         CodexPopup {
