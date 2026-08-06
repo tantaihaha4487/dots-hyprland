@@ -120,6 +120,7 @@ StyledPopup {
 
             RowLayout {
                 Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
                 StyledText {
                     text: entry?.usage?.accountEmail ?? entry?.account ?? "OpenAI Codex"
                     color: Appearance.colors.colOnLayer2
@@ -129,6 +130,7 @@ StyledPopup {
                     Layout.fillWidth: true
                 }
                 StyledText {
+                    Layout.alignment: Qt.AlignVCenter
                     text: {
                         const method = entry?.usage?.loginMethod ?? entry?.source ?? ""
                         return method ? method.charAt(0).toUpperCase() + method.slice(1) : ""
@@ -194,6 +196,7 @@ StyledPopup {
             Layout.fillWidth: true
             spacing: 10
             Item {
+                Layout.alignment: Qt.AlignVCenter
                 implicitWidth: 26
                 implicitHeight: 26
                 StyledImage {
@@ -208,6 +211,7 @@ StyledPopup {
                 }
             }
             StyledText {
+                Layout.alignment: Qt.AlignVCenter
                 text: "Codex"
                 color: Appearance.colors.colOnLayer2
                 font.pixelSize: Appearance.font.pixelSize.larger
@@ -215,6 +219,7 @@ StyledPopup {
             }
             Item { Layout.fillWidth: true }
             StyledText {
+                Layout.alignment: Qt.AlignVCenter
                 visible: root.displayEntries.length <= 1
                 text: root.displayEntries[0]?.usage?.accountEmail ?? "OpenAI Codex"
                 color: Appearance.colors.colSubtext
