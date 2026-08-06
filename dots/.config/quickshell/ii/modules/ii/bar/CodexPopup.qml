@@ -81,10 +81,12 @@ StyledPopup {
         }
         StyledText {
             visible: parent.note.length > 0
+            Layout.fillWidth: true
             text: parent.note
             color: Appearance.colors.colSubtext
             font.pixelSize: Appearance.font.pixelSize.small
             wrapMode: Text.Wrap
+            elide: Text.ElideNone
         }
     }
 
