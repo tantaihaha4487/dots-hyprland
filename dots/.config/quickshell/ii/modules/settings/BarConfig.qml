@@ -281,6 +281,29 @@ ContentPage {
             }
         }
 
+        ContentSubsection {
+            title: Translation.tr("Popup accounts")
+
+            ConfigSelectionArray {
+                currentValue: Config.options.bar.codexUsage.accountDisplayMode
+                onSelected: newValue => {
+                    Config.options.bar.codexUsage.accountDisplayMode = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("All accounts"),
+                        icon: "groups",
+                        value: "all"
+                    },
+                    {
+                        displayName: Translation.tr("Current account only"),
+                        icon: "person",
+                        value: "current"
+                    }
+                ]
+            }
+        }
+
         ConfigSpinBox {
             icon: "refresh"
             text: Translation.tr("Refresh interval (minutes)")

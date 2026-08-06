@@ -13,7 +13,9 @@ Item {
     property string detailText: "Waiting for CodexBar"
     property color textColor: Appearance.colors.colOnLayer1
     property var usageEntry: null
+    property var accountEntries: []
     property string errorText: ""
+    property bool refreshQueued: false
 
     implicitWidth: contentLayout.implicitWidth
     implicitHeight: Appearance.sizes.barHeight
@@ -100,23 +102,49 @@ Item {
                 root.statusText = "Codex !"
                 root.detailText = error.message || "CodexBar could not fetch usage"
                 root.errorText = root.detailText
-                return
+            } else {
+                root.usageEntry = data?.[0] ?? null
+                root.errorText = ""
+                root.statusText = formatPercentages(data)
+                root.detailText = "CodexBar usage"
             }
-
-            root.usageEntry = data?.[0] ?? null
-            root.errorText = ""
-            root.statusText = formatPercentages(data)
-            root.detailText = "CodexBar usage"
         } catch (error) {
             root.statusText = "Codex !"
             root.detailText = "Invalid CodexBar JSON output"
             root.errorText = root.detailText
         }
+
+        if (Config.options.bar.codexUsage.accountDisplayMode === "all") {
+            if (!allAccountsProcess.running)
+                allAccountsProcess.running = true
+        } else if (root.refreshQueued) {
+            root.refreshQueued = false
+            root.refreshUsage()
+        }
     }
 
     function refreshUsage() {
+        if (usageProcess.running || allAccountsProcess.running) {
+            root.refreshQueued = true
+            return
+        }
+        root.accountEntries = []
         if (!usageProcess.running)
             usageProcess.running = true
+    }
+
+    function updateAllAccounts(text) {
+        try {
+            const data = JSON.parse(text)
+            root.accountEntries = Array.isArray(data) ? data : []
+        } catch (error) {
+            root.accountEntries = []
+        }
+
+        if (root.refreshQueued) {
+            root.refreshQueued = false
+            root.refreshUsage()
+        }
     }
 
     Process {
@@ -128,13 +156,21 @@ Item {
         }
     }
 
+    Process {
+        id: allAccountsProcess
+        command: ["codexbar", "usage", "--provider", "codex", "--all-accounts", "--format", "json"]
+
+        stdout: StdioCollector {
+            onStreamFinished: root.updateAllAccounts(text)
+        }
+    }
+
     Timer {
         interval: Math.max(1, Config.options.bar.codexUsage.refreshIntervalMinutes) * 60000
         running: true
         repeat: true
         onTriggered: {
-            if (!usageProcess.running)
-                usageProcess.running = true
+            root.refreshUsage()
         }
     }
 
@@ -144,6 +180,11 @@ Item {
         function onDisplayModeChanged() {
             if (root.usageEntry)
                 root.statusText = root.formatPercentages([root.usageEntry])
+        }
+
+        function onAccountDisplayModeChanged() {
+            root.accountEntries = []
+            root.refreshUsage()
         }
     }
 
@@ -201,6 +242,8 @@ Item {
         CodexPopup {
             hoverTarget: Config.options.bar.codexUsage.showPopup ? mouseArea : null
             usageEntry: root.usageEntry
+            accountEntries: root.accountEntries
+            accountDisplayMode: Config.options.bar.codexUsage.accountDisplayMode
             errorText: root.errorText
             showPace: Config.options.bar.codexUsage.showPace
             showResetCredits: Config.options.bar.codexUsage.showResetCredits
