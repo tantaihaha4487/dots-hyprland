@@ -1,0 +1,8 @@
+[Unit]
+Description=Quickshell ii desktop shell
+
+[Service]
+ExecStart=/usr/bin/qs -c ii
+Restart=always
+RestartSec=2
+TimeoutStopSec=5
