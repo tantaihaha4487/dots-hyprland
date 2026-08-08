@@ -1,8 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import "." as SettingsComponents
 
 ContentPage {
     forceWidth: true
@@ -303,6 +306,8 @@ ContentPage {
                 ]
             }
         }
+
+        SettingsComponents.CodexAccounts {}
 
         ConfigSpinBox {
             icon: "refresh"

@@ -15,6 +15,8 @@ Item {
     property var usageEntry: null
     property var accountEntries: []
     property string errorText: ""
+    property string resolvedAccountId: "current"
+    property string fallbackText: ""
     property bool refreshQueued: false
 
     implicitWidth: contentLayout.implicitWidth
@@ -56,7 +58,9 @@ Item {
     }
 
     function formatPercentages(data) {
-        const weeklyUsed = data?.[0]?.usage?.secondary?.usedPercent
+        const first = Array.isArray(data) && data.length > 0 ? data[0] : null
+        const weeklyUsed = first && first.usage && first.usage.secondary
+            ? first.usage.secondary.usedPercent : null
         if (typeof weeklyUsed === "number") {
             const used = Math.round(Math.max(0, Math.min(100, weeklyUsed)))
             switch (Config.options.bar.codexUsage.displayMode) {
@@ -97,16 +101,17 @@ Item {
     function updateFrom(text) {
         try {
             const data = JSON.parse(text)
-            const error = data?.[0]?.error
+            const first = Array.isArray(data) && data.length > 0 ? data[0] : null
+            const error = first ? first.error : null
             if (error) {
                 root.statusText = "Codex !"
                 root.detailText = error.message || "CodexBar could not fetch usage"
                 root.errorText = root.detailText
             } else {
-                root.usageEntry = data?.[0] ?? null
-                root.errorText = ""
-                root.statusText = formatPercentages(data)
-                root.detailText = "CodexBar usage"
+                root.usageEntry = first || null
+                root.errorText = root.fallbackText
+                root.statusText = formatPercentages(data) + (root.fallbackText.length > 0 ? " · current" : "")
+                root.detailText = root.fallbackText.length > 0 ? root.fallbackText : "CodexBar usage"
             }
         } catch (error) {
             root.statusText = "Codex !"
@@ -124,14 +129,27 @@ Item {
     }
 
     function refreshUsage() {
-        if (usageProcess.running || allAccountsProcess.running) {
+        if (accountResolver.running || usageProcess.running || allAccountsProcess.running) {
             root.refreshQueued = true
             return
         }
         if (Config.options.bar.codexUsage.accountDisplayMode !== "all")
             root.accountEntries = []
-        if (!usageProcess.running)
-            usageProcess.running = true
+        accountResolver.command = [Quickshell.shellPath("scripts/codexbar/accounts.sh"), "resolve", Config.options.bar.codexUsage.barAccountMode]
+        accountResolver.running = true
+    }
+
+    function updateResolution(text) {
+        try {
+            const result = JSON.parse(text)
+            root.resolvedAccountId = result.resolved || "current"
+            root.fallbackText = result.fallback ? (result.message || "Selected account unavailable; using current account.") : ""
+        } catch (error) {
+            root.resolvedAccountId = "current"
+            root.fallbackText = "Could not resolve selected account; using current account."
+        }
+        usageProcess.command = [Quickshell.shellPath("scripts/codexbar/accounts.sh"), "usage", root.resolvedAccountId]
+        usageProcess.running = true
     }
 
     function updateAllAccounts(text) {
@@ -149,8 +167,14 @@ Item {
     }
 
     Process {
+        id: accountResolver
+        stdout: StdioCollector {
+            onStreamFinished: root.updateResolution(text)
+        }
+    }
+
+    Process {
         id: usageProcess
-        command: ["codexbar", "usage", "--provider", "codex", "--format", "json"]
 
         stdout: StdioCollector {
             onStreamFinished: root.updateFrom(text)
@@ -185,6 +209,10 @@ Item {
 
         function onAccountDisplayModeChanged() {
             root.accountEntries = []
+            root.refreshUsage()
+        }
+
+        function onBarAccountModeChanged() {
             root.refreshUsage()
         }
     }

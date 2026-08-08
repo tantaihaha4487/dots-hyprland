@@ -251,7 +251,7 @@ Singleton {
                 property JsonObject codexUsage: JsonObject {
                     property string displayMode: "remaining" // remaining | used | iconOnly
                     property string accountDisplayMode: "all" // all | current
-                    property string barAccountMode: "current" // current
+                    property string barAccountMode: "current" // current | managed account UUID
                     property int refreshIntervalMinutes: 5
                     property bool showPopup: true
                     property bool showPace: true

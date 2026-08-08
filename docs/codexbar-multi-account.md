@@ -1,83 +1,99 @@
-# Add another Codex account on Linux
+# Manage additional Codex accounts on Linux
 
-The Codex CLI normally keeps one active login in `~/.codex`. CodexBar can show
-additional accounts when each account has its own `CODEX_HOME` and is registered
-in its managed-account file.
+The primary Codex CLI login remains in `~/.codex` and is read-only in this
+workflow. Additional accounts use isolated Codex homes under
+`${XDG_DATA_HOME:-$HOME/.local/share}/CodexBar/managed-codex-homes/`.
 
-The helper in this repository performs that setup without replacing the login in
-`~/.codex`.
+Account emails and private credential paths are never written to the tracked
+Quickshell defaults. Settings persists only `"current"` or the selected managed
+account UUID in `bar.codexUsage.barAccountMode`.
 
 ## Requirements
 
 - `codex`
-- `codexbar`
+- `codexbar` 0.42.1 or newer
 - `jq`
+- `flock` from `util-linux`
 
 On Arch Linux, `./setup install-deps` installs the `codexbar-cli` package used by
 the bar widget.
 
-## Add an account
+## Settings workflow
 
-From the repository root, run:
+Open **Settings → Bar → CodexBar → Accounts**.
+
+- **Add account** opens Codex browser authentication in a new isolated home.
+- **Re-authenticate** stages a fresh login and replaces the working credentials
+  only after the account identity has been verified.
+- **Remove** asks for confirmation, unregisters the account, and moves its
+  private home into the restoration archive.
+- **Restore** moves an archived account back into managed accounts.
+- **Refresh** reloads account status without showing tokens, authorization URLs,
+  credential paths, or raw authentication data.
+- **Compact bar account** selects the account shown by the weekly quota. Popup
+  account display remains controlled independently by **Popup accounts**.
+
+The primary account cannot be re-authenticated or removed here. If a selected
+managed account disappears or its credentials become unavailable, the compact
+bar shows current-account usage and labels the fallback.
+
+## Command-line workflow
+
+The command-line helper uses the exact same backend as Settings:
 
 ```bash
 ./sdata/codexbar/add-account.sh
 ```
 
-Complete the browser login using the additional ChatGPT account. The script then:
+The backend can also be called directly:
 
-1. Creates an isolated Codex home under
-   `~/.local/share/CodexBar/managed-codex-homes/`.
-2. Runs `codex login` only inside that home.
-3. Registers the account in
-   `~/.local/share/CodexBar/managed-codex-accounts.json`.
-4. Creates a timestamped backup before changing an existing account file.
-5. Prints every account detected by CodexBar.
+```bash
+backend=./dots/.config/quickshell/ii/scripts/codexbar/accounts.sh
 
-If `XDG_DATA_HOME` is set, CodexBar uses that directory instead of
-`~/.local/share`.
+"$backend" list
+"$backend" add
+"$backend" reauth MANAGED_ACCOUNT_UUID
+"$backend" remove MANAGED_ACCOUNT_UUID
+"$backend" restore ARCHIVE_ID
+"$backend" resolve current
+"$backend" usage MANAGED_ACCOUNT_UUID
+```
+
+All backend responses are sanitized JSON intended for Settings and automation.
+`list` reports account IDs, emails, and status, but never returns credential
+paths or credential contents. `usage` resolves the UUID internally and invokes
+CodexBar with the isolated `CODEX_HOME`, because CodexBar 0.42.1 does not select
+Codex managed homes through its token-account `--account` flag.
+
+## Storage and recovery
+
+The backend serializes registry updates with a lock, writes the registry
+atomically with mode `0600`, and creates a timestamped backup before every
+change. Managed homes and archive directories use mode `0700`.
+
+Removed accounts remain under:
+
+```text
+${XDG_DATA_HOME:-$HOME/.local/share}/CodexBar/managed-codex-archives/
+```
+
+Permanent archive deletion is deliberately outside this workflow.
 
 ## Verify
 
 ```bash
+./dots/.config/quickshell/ii/scripts/codexbar/accounts.sh list | jq
+
 codexbar usage --provider codex --all-accounts --format json |
   jq -r '.[] | (.usage.accountEmail // .account // "unknown")'
 ```
 
-Each account email should appear on its own line.
-
-In **Settings → Bar → CodexBar**, select **Popup accounts → All accounts**. Move
-the pointer away from CodexBar and hover it again, or press **Refresh usage** in
-the popup.
-
-## Troubleshooting
-
-### The browser used the existing account
-
-Sign out of ChatGPT in the browser or use a private browser window, then run the
-helper again and choose the other account.
-
-### Login succeeded but registration failed
-
-The script prints the isolated Codex home it created. Re-run the login for that
-home with:
+To test lifecycle and concurrency behavior without touching real credentials:
 
 ```bash
-CODEX_HOME="/path/printed/by/the/script" codex login
+./tests/codexbar/account-manager-test.sh
 ```
 
-Then run the helper again if the account is not listed.
-
-### Only one account appears
-
-Check the managed account file and query CodexBar directly:
-
-```bash
-jq '.accounts[] | {email, managedHomePath}' \
-  "${XDG_DATA_HOME:-$HOME/.local/share}/CodexBar/managed-codex-accounts.json"
-
-codexbar usage --provider codex --all-accounts --format json | jq
-```
-
-Do not copy or publish `auth.json`, access tokens, or the managed Codex homes.
-They contain private authentication credentials.
+Never copy or publish `auth.json`, access tokens, managed Codex homes, registry
+backups, or restoration archives. They contain private machine-local account
+data.

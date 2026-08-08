@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" != "login" ]]; then
+    exit 2
+fi
+
+if [[ "${2:-}" == "status" ]]; then
+    [[ -f "$CODEX_HOME/auth.json" ]]
+    exit
+fi
+
+[[ "${MOCK_LOGIN_FAIL:-0}" != "1" ]] || exit 1
+mkdir -p "$CODEX_HOME"
+printf '{"tokens":{"account_id":"%s"}}\n' "${MOCK_PROVIDER_ID:-provider-default}" > "$CODEX_HOME/auth.json"
+chmod 600 "$CODEX_HOME/auth.json"
